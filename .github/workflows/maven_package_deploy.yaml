@@ -16,4 +16,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run:
-          mvn --settings .mvn/settings.xml deploy
+          mvn --settings .mvn/project-settings.xml deploy
