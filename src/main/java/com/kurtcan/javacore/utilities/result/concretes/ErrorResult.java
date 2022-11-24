@@ -1,7 +1,6 @@
 package com.kurtcan.javacore.utilities.result.concretes;
 
 import com.kurtcan.javacore.utilities.result.abstracts.IResult;
-import com.kurtcan.javacore.utilities.result.abstracts.Result;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;

@@ -1,5 +1,6 @@
-package com.kurtcan.javacore.utilities.result.abstracts;
+package com.kurtcan.javacore.utilities.result.concretes;
 
+import com.kurtcan.javacore.utilities.result.abstracts.IDataResult;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
