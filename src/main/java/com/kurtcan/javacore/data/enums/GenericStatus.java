@@ -5,9 +5,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum OnlineStatus {
-    OFFLINE(0),
-    ONLINE(1);
+public enum GenericStatus {
+    PASSIVE(0),
+    ACTIVE(1),
+    DELETED(2);
 
     public final int status;
 }

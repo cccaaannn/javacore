@@ -4,9 +4,9 @@ import com.kurtcan.javacore.utilities.result.abstracts.IResult;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-public abstract class BaseController implements IBaseController {
+public abstract class BaseApiController implements IBaseController {
 
-    public ResponseEntity<?> httpResult(IResult result) {
+    public ResponseEntity<?> toHttpResponse(IResult result) {
         if (result.getStatus()) {
             return new ResponseEntity<>(result, HttpStatus.OK);
         } else {

@@ -3,11 +3,11 @@ package com.kurtcan.javacore.security.encryption.jasypt;
 import com.kurtcan.javacore.security.encryption.abstracts.IPasswordEncryptor;
 import org.jasypt.util.password.BasicPasswordEncryptor;
 
-public class JasyptEncryptionAdapter implements IPasswordEncryptor {
+public class JasyptPasswordEncryptor implements IPasswordEncryptor {
 
     BasicPasswordEncryptor encryptor;
 
-    public JasyptEncryptionAdapter() {
+    public JasyptPasswordEncryptor() {
         this.encryptor = new BasicPasswordEncryptor();
     }
 
