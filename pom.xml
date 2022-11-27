@@ -32,6 +32,12 @@
             <optional>true</optional>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+            <version>1.10.0</version>
+        </dependency>
+
         <!-- Auth0 -->
         <dependency>
             <groupId>com.auth0</groupId>
