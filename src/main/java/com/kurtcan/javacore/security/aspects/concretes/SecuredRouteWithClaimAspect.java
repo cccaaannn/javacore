@@ -17,10 +17,10 @@ import java.util.List;
 @Component
 public class SecuredRouteWithClaimAspect {
 
-    private final IAuthorizationProvider authorizationProvider;
+    private IAuthorizationProvider authorizationProvider;
 
     @Autowired(required = false)
-    public SecuredRouteWithClaimAspect(IAuthorizationProvider authorizationProvider) {
+    public void setAuthorizationProvider(IAuthorizationProvider authorizationProvider) {
         this.authorizationProvider = authorizationProvider;
     }
 

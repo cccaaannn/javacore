@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class SecuredRouteAspect {
 
-    private final IAuthorizationProvider authorizationProvider;
+    private IAuthorizationProvider authorizationProvider;
 
     @Autowired(required = false)
-    public SecuredRouteAspect(IAuthorizationProvider authorizationProvider) {
+    public void setAuthorizationProvider(IAuthorizationProvider authorizationProvider) {
         this.authorizationProvider = authorizationProvider;
     }
 
