@@ -1,6 +1,6 @@
 package com.kurtcan.javacore.security.aspects.concretes;
 
-import com.kurtcan.javacore.exception.UnauthorizedException;
+import com.kurtcan.javacore.exception.UnAuthorizedException;
 import com.kurtcan.javacore.security.aspects.abstracts.IAuthorizationProvider;
 import com.kurtcan.javacore.security.aspects.annotations.SecuredRouteWithClaim;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -43,7 +43,7 @@ public class SecuredRouteWithClaimAspect {
             }
         }
 
-        throw new UnauthorizedException();
+        throw new UnAuthorizedException();
     }
 
 }
