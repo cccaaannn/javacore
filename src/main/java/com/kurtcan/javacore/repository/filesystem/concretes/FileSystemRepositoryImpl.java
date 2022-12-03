@@ -13,7 +13,7 @@ import java.nio.file.Path;
  *
  * @param <T> entity type
  * @author Can Kurt
- * @version 2.0
+ * @version 2.5
  * @since 2022-11-26
  */
 @Component

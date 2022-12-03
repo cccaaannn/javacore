@@ -5,7 +5,10 @@ import com.kurtcan.javacore.repository.filesystem.aspect.annotations.FileSystemS
 import com.kurtcan.javacore.repository.filesystem.exceptions.FileSystemRepositoryException;
 import com.kurtcan.javacore.repository.filesystem.exceptions.FileSystemRepositoryIOException;
 import com.kurtcan.javacore.repository.filesystem.exceptions.IllegalFileSystemRepositoryUsageException;
-import com.kurtcan.javacore.repository.filesystem.utils.FileSystemRepositoryStringUtils;
+import com.kurtcan.javacore.repository.filesystem.utils.FileSystemRepositoryUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -20,17 +23,25 @@ import java.util.*;
  *
  * @param <T> entity type
  * @author Can Kurt
- * @version 2.0
+ * @version 2.5
  * @since 2022-11-26
  */
+@Component
 class FileSystemRepositoryBase<T> {
+
+    private Environment environment;
+
+    @Autowired(required = false)
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+    }
 
     /**
      * @param entity      used to get file from MultipartFile
      * @param absSavePath save path for the file
+     * @return Saved file path
      * @throws FileSystemRepositoryException   thrown on any other Exception during saving.
      * @throws FileSystemRepositoryIOException thrown if file saving throws IOException
-     * @return Saved file path
      */
     protected Path saveFileFromEntityField(T entity, Path absSavePath) throws FileSystemRepositoryIOException, FileSystemRepositoryException {
         // Check if the file exists and throw if 'overrideExisting' flag is disabled
@@ -85,8 +96,8 @@ class FileSystemRepositoryBase<T> {
         }
 
         String pathTemplate = fileSystemEntityAnnotation.value();
-        Map<String, String> templateFillerMap = getTemplateFillerMap(entity);
-        String filledTemplate = FileSystemRepositoryStringUtils.formatWithNamedParams(pathTemplate, templateFillerMap);
+        Map<String, String> templateFillerMap = this.getTemplateFillerMap(entity);
+        String filledTemplate = FileSystemRepositoryUtils.formatWithNamedParams(pathTemplate, templateFillerMap);
         return Paths.get(filledTemplate);
     }
 
@@ -104,10 +115,9 @@ class FileSystemRepositoryBase<T> {
             }
             try {
                 field.setAccessible(true);
-                String fieldName = getPathVariableName(field);
-                String fieldValue = field.get(entity).toString();
+                String fieldName = this.getPathVariableName(field);
+                String fieldValue = this.getPathVariableValue(entity, field);
                 templateFillerMap.put(fieldName, fieldValue);
-            } catch (IllegalAccessException ignored) {
             } catch (Exception e) {
                 throw new FileSystemRepositoryException(e);
             }
@@ -121,10 +131,28 @@ class FileSystemRepositoryBase<T> {
      */
     private String getPathVariableName(Field field) {
         FileSystemSavePathVariable fileSystemSavePathVariableAnnotation = field.getAnnotation(FileSystemSavePathVariable.class);
-        if (Objects.nonNull(fileSystemSavePathVariableAnnotation) && !fileSystemSavePathVariableAnnotation.value().isBlank()) {
+        if (Objects.nonNull(fileSystemSavePathVariableAnnotation) &&
+                !FileSystemRepositoryUtils.safeIsBlank(fileSystemSavePathVariableAnnotation.value())
+        ) {
             return fileSystemSavePathVariableAnnotation.value();
         }
         return field.getName();
+    }
+
+    /**
+     * @param entity instance for getting values
+     * @param field entity field
+     * @return fields value or if 'SavePathVariable' annotation is used with 'fromEnvironmentVariable' switch, return environment value for provided value.
+     * (Users spring environment to retrieve variables)
+     */
+    private String getPathVariableValue(T entity, Field field) throws IllegalAccessException {
+        FileSystemSavePathVariable fileSystemSavePathVariableAnnotation = field.getAnnotation(FileSystemSavePathVariable.class);
+        if (Objects.nonNull(fileSystemSavePathVariableAnnotation) &&
+                !FileSystemRepositoryUtils.safeIsBlank(fileSystemSavePathVariableAnnotation.fromEnvironment())
+        ) {
+            return this.environment.getProperty(fileSystemSavePathVariableAnnotation.fromEnvironment());
+        }
+        return field.get(entity).toString();
     }
 
 }
