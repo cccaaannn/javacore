@@ -1,4 +1,4 @@
-package com.kurtcan.javacore.utilities.email.javax;
+package com.kurtcan.javacore.utilities.email.jakarta;
 
 import com.kurtcan.javacore.utilities.email.abstracts.IEmailClient;
 import com.kurtcan.javacore.utilities.email.dtos.Email;
@@ -6,19 +6,19 @@ import com.kurtcan.javacore.utilities.email.exceptions.EmailClientException;
 
 import java.util.Properties;
 
-public class JavaxEmailClient extends BaseEmailClient implements IEmailClient {
+public class JakartaEmailClient extends BaseEmailClient implements IEmailClient {
 
     private final String username;
     private final String password;
 
-    public JavaxEmailClient(Properties properties, String username, String password) {
+    public JakartaEmailClient(Properties properties, String username, String password) {
         super(properties);
 
         this.username = username;
         this.password = password;
     }
 
-    public JavaxEmailClient(String host, String port, String username, String password) {
+    public JakartaEmailClient(String host, String port, String username, String password) {
         super();
 
         properties.put("mail.smtp.starttls.enable", "true");

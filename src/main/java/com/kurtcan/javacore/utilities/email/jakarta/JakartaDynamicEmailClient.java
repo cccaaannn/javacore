@@ -1,4 +1,4 @@
-package com.kurtcan.javacore.utilities.email.javax;
+package com.kurtcan.javacore.utilities.email.jakarta;
 
 
 import com.kurtcan.javacore.utilities.email.abstracts.IDynamicEmailClient;
@@ -7,13 +7,13 @@ import com.kurtcan.javacore.utilities.email.exceptions.EmailClientException;
 
 import java.util.Properties;
 
-public class JavaxDynamicEmailClient extends BaseEmailClient implements IDynamicEmailClient {
+public class JakartaDynamicEmailClient extends BaseEmailClient implements IDynamicEmailClient {
 
-    public JavaxDynamicEmailClient(Properties properties) {
+    public JakartaDynamicEmailClient(Properties properties) {
         super(properties);
     }
 
-    public JavaxDynamicEmailClient(String host, String port) {
+    public JakartaDynamicEmailClient(String host, String port) {
         super();
 
         properties.put("mail.smtp.starttls.enable", "true");
