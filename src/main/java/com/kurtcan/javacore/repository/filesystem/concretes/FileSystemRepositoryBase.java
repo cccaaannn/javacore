@@ -96,12 +96,34 @@ class FileSystemRepositoryBase<T> {
         }
 
         String pathTemplate = fileSystemEntityAnnotation.value();
+
+        // Replace environment values before starting for replacing regular values.
+        pathTemplate = this.replaceEnvironmentVariables(pathTemplate);
+
+        // Replace regular values
         Map<String, String> templateFillerMap = this.getTemplateFillerMap(entity);
         String filledTemplate = FileSystemRepositoryUtils.formatWithNamedParams(pathTemplate, templateFillerMap);
+
         return Paths.get(filledTemplate);
     }
 
 
+
+    /**
+     * Replaces string templates environment fields. Ex: ${test}/aaa/{bbb}/c.pdf -> replaced/aaa/{bbb}/c.pdf
+     * @param template string template to be filled with environment variables
+     * @return replaced string template
+     */
+    private String replaceEnvironmentVariables(String template) {
+        List<String> matches = FileSystemRepositoryUtils.findEnvironmentValues(template);
+        for (String match: matches) {
+            // Removes braces ${test} -> test
+            String clearedMatch = match.substring(2, match.length()-1);
+            String value = this.environment.getProperty(clearedMatch);
+            template = FileSystemRepositoryUtils.replaceEnvironmentValue(template, match, value);
+        }
+        return template;
+    }
 
     /**
      * @param entity to be used for filling the Map
