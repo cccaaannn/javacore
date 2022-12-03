@@ -1,6 +1,6 @@
 package com.kurtcan.javacore.repository.filesystem.concretes;
 
-import com.kurtcan.javacore.repository.filesystem.abstracts.FileSystemRepository;
+import com.kurtcan.javacore.repository.filesystem.abstracts.IFileSystemRepository;
 import com.kurtcan.javacore.repository.filesystem.exceptions.FileSystemRepositoryIOException;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ import java.nio.file.Path;
  * @since 2022-11-26
  */
 @Component
-public class FileSystemRepositoryImpl<T> extends FileSystemRepositoryBase<T> implements FileSystemRepository<T> {
+public class FileSystemRepositoryImpl<T> extends FileSystemRepositoryBase<T> implements IFileSystemRepository<T> {
 
     @Override
     public Path save(T entity) throws FileSystemRepositoryIOException {
