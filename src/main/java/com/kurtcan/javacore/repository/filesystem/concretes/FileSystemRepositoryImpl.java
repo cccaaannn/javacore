@@ -1,6 +1,6 @@
 package com.kurtcan.javacore.repository.filesystem.concretes;
 
-import com.kurtcan.javacore.repository.filesystem.abstracts.IFileSystemRepository;
+import com.kurtcan.javacore.repository.filesystem.abstracts.FileSystemRepository;
 import com.kurtcan.javacore.repository.filesystem.exceptions.FileSystemRepositoryIOException;
 import org.springframework.stereotype.Component;
 
@@ -17,19 +17,16 @@ import java.nio.file.Path;
  * @since 2022-11-26
  */
 @Component
-public class FileSystemRepositoryImpl<T> extends FileSystemRepositoryBase<T> implements IFileSystemRepository<T> {
+public class FileSystemRepositoryImpl<T> extends FileSystemRepositoryBase<T> implements FileSystemRepository<T> {
 
     @Override
     public Path save(T entity) throws FileSystemRepositoryIOException {
-        Path absSavePath = this.buildSavePathFromEntityFields(entity);
-        this.saveFileFromEntityField(entity, absSavePath);
-        return absSavePath;
+        return this.saveFileFromEntityField(entity, this.buildSavePathFromEntityFields(entity));
     }
 
     @Override
     public boolean delete(T entity) {
-        Path absSavePath = this.buildSavePathFromEntityFields(entity);
-        return this.deleteFile(absSavePath);
+        return this.deleteFile(this.buildSavePathFromEntityFields(entity));
     }
 
     @Override

@@ -26,20 +26,13 @@ import java.util.*;
 class FileSystemRepositoryBase<T> {
 
     /**
-     * @param absSavePath file path to delete
-     * @return file delete result
-     */
-    protected boolean deleteFile(Path absSavePath) {
-        return absSavePath.toFile().delete();
-    }
-
-    /**
      * @param entity      used to get file from MultipartFile
      * @param absSavePath save path for the file
      * @throws FileSystemRepositoryException   thrown on any other Exception during saving.
      * @throws FileSystemRepositoryIOException thrown if file saving throws IOException
+     * @return Saved file path
      */
-    protected void saveFileFromEntityField(T entity, Path absSavePath) throws FileSystemRepositoryIOException, FileSystemRepositoryException {
+    protected Path saveFileFromEntityField(T entity, Path absSavePath) throws FileSystemRepositoryIOException, FileSystemRepositoryException {
         // Check if the file exists and throw if 'overrideExisting' flag is disabled
         FileSystemEntity fileSystemEntityAnnotation = entity.getClass().getDeclaredAnnotation(FileSystemEntity.class);
         boolean overrideExisting = fileSystemEntityAnnotation.overrideExisting();
@@ -69,6 +62,16 @@ class FileSystemRepositoryBase<T> {
         } catch (Exception e) {
             throw new FileSystemRepositoryException(e);
         }
+
+        return absSavePath;
+    }
+
+    /**
+     * @param absSavePath file path to delete
+     * @return file delete result
+     */
+    protected boolean deleteFile(Path absSavePath) {
+        return absSavePath.toFile().delete();
     }
 
     /**
@@ -87,11 +90,13 @@ class FileSystemRepositoryBase<T> {
         return Paths.get(filledTemplate);
     }
 
+
+
     /**
      * @param entity to be used for filling the Map
      * @return the Map which filled by the values of the entity.
      */
-    protected Map<String, String> getTemplateFillerMap(T entity) {
+    private Map<String, String> getTemplateFillerMap(T entity) {
         Map<String, String> templateFillerMap = new HashMap<>();
         for (Field field : entity.getClass().getDeclaredFields()) {
             if (field.getType() == MultipartFile.class) {
@@ -114,7 +119,7 @@ class FileSystemRepositoryBase<T> {
      * @param field entity field
      * @return fields name or if 'SavePathVariable' annotation is used on the variable returns value passed to it.
      */
-    protected String getPathVariableName(Field field) {
+    private String getPathVariableName(Field field) {
         FileSystemSavePathVariable fileSystemSavePathVariableAnnotation = field.getAnnotation(FileSystemSavePathVariable.class);
         if (Objects.nonNull(fileSystemSavePathVariableAnnotation) && !fileSystemSavePathVariableAnnotation.value().isBlank()) {
             return fileSystemSavePathVariableAnnotation.value();

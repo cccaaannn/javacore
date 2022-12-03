@@ -7,7 +7,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 @Component
-public interface IFileSystemRepository<T> {
+public interface FileSystemRepository<T> {
     Path save(T entity) throws FileSystemRepositoryIOException;
 
     boolean delete(T entity);
