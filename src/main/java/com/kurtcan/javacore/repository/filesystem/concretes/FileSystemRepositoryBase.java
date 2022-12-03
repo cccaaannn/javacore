@@ -1,10 +1,11 @@
-package com.kurtcan.javacore.repository.multipartfile.concretes;
+package com.kurtcan.javacore.repository.filesystem.concretes;
 
-import com.kurtcan.javacore.repository.multipartfile.aspect.annotations.SavePathTemplate;
-import com.kurtcan.javacore.repository.multipartfile.aspect.annotations.SavePathVariable;
-import com.kurtcan.javacore.repository.multipartfile.exceptions.IllegalMultipartFileRepositoryUsageException;
-import com.kurtcan.javacore.repository.multipartfile.exceptions.MultipartFileRepositoryException;
-import com.kurtcan.javacore.repository.multipartfile.utils.MultipartFileRepositoryStringUtils;
+import com.kurtcan.javacore.repository.filesystem.aspect.annotations.FileSystemEntity;
+import com.kurtcan.javacore.repository.filesystem.aspect.annotations.FileSystemSavePathVariable;
+import com.kurtcan.javacore.repository.filesystem.exceptions.FileSystemRepositoryException;
+import com.kurtcan.javacore.repository.filesystem.exceptions.FileSystemRepositoryIOException;
+import com.kurtcan.javacore.repository.filesystem.exceptions.IllegalFileSystemRepositoryUsageException;
+import com.kurtcan.javacore.repository.filesystem.utils.FileSystemRepositoryStringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,15 +15,15 @@ import java.nio.file.Paths;
 import java.util.*;
 
 /**
- * <h2>MultipartFileRepository helper class.</h2>
+ * <h2>FileSystemRepository helper class.</h2>
  * <hr/>
  *
  * @param <T> entity type
  * @author Can Kurt
- * @version 1.0
+ * @version 2.0
  * @since 2022-11-26
  */
-class MultipartFileRepositoryBase<T> {
+class FileSystemRepositoryBase<T> {
 
     /**
      * @param absSavePath file path to delete
@@ -35,33 +36,38 @@ class MultipartFileRepositoryBase<T> {
     /**
      * @param entity      used to get file from MultipartFile
      * @param absSavePath save path for the file
-     * @throws IOException
+     * @throws FileSystemRepositoryException   thrown on any other Exception during saving.
+     * @throws FileSystemRepositoryIOException thrown if file saving throws IOException
      */
-    protected void saveFileFromEntityField(T entity, Path absSavePath) throws IOException {
+    protected void saveFileFromEntityField(T entity, Path absSavePath) throws FileSystemRepositoryIOException, FileSystemRepositoryException {
         // Check if the file exists and throw if 'overrideExisting' flag is disabled
-        SavePathTemplate savePathTemplateAnnotation = entity.getClass().getDeclaredAnnotation(SavePathTemplate.class);
-        boolean overrideExisting = savePathTemplateAnnotation.overrideExisting();
+        FileSystemEntity fileSystemEntityAnnotation = entity.getClass().getDeclaredAnnotation(FileSystemEntity.class);
+        boolean overrideExisting = fileSystemEntityAnnotation.overrideExisting();
         if (absSavePath.toFile().exists() && !overrideExisting) {
-            throw new IOException();
+            throw new FileSystemRepositoryIOException("File exists");
         }
 
         // Check if MultipartFile is occurred only once in entity
         List<Field> multipartFileFields = Arrays.stream(entity.getClass().getDeclaredFields()).filter(field -> field.getType() == MultipartFile.class).toList();
         if (multipartFileFields.size() != 1) {
-            throw new IllegalMultipartFileRepositoryUsageException("Entity class must contain exactly one '%s' type.".formatted(MultipartFile.class.getSimpleName()));
+            throw new IllegalFileSystemRepositoryUsageException("Entity class must contain exactly one '%s' type.".formatted(MultipartFile.class.getSimpleName()));
         }
-
-        // Create parent directories if needed
-        absSavePath.toFile().getParentFile().mkdirs();
 
         // Get MultipartFile field from entity and save
         Field multipartFileField = multipartFileFields.get(0);
         multipartFileField.setAccessible(true);
+
         try {
+            // Create parent directories if needed
+            absSavePath.toFile().getParentFile().mkdirs();
+
+            // Save file
             MultipartFile multipartFile = (MultipartFile) multipartFileField.get(entity);
             multipartFile.transferTo(absSavePath.toFile());
+        } catch (IOException e) {
+            throw new FileSystemRepositoryIOException(e);
         } catch (Exception e) {
-            throw new MultipartFileRepositoryException(e);
+            throw new FileSystemRepositoryException(e);
         }
     }
 
@@ -70,14 +76,14 @@ class MultipartFileRepositoryBase<T> {
      * @return absSavePath created by fields from the entity
      */
     protected Path buildSavePathFromEntityFields(T entity) {
-        SavePathTemplate savePathTemplateAnnotation = entity.getClass().getDeclaredAnnotation(SavePathTemplate.class);
-        if (Objects.isNull(savePathTemplateAnnotation)) {
-            throw new IllegalMultipartFileRepositoryUsageException("Entity class must have '%s' annotation.".formatted(SavePathTemplate.class.getSimpleName()));
+        FileSystemEntity fileSystemEntityAnnotation = entity.getClass().getDeclaredAnnotation(FileSystemEntity.class);
+        if (Objects.isNull(fileSystemEntityAnnotation)) {
+            throw new IllegalFileSystemRepositoryUsageException("Entity class must have '%s' annotation.".formatted(FileSystemEntity.class.getSimpleName()));
         }
 
-        String pathTemplate = savePathTemplateAnnotation.value();
+        String pathTemplate = fileSystemEntityAnnotation.value();
         Map<String, String> templateFillerMap = getTemplateFillerMap(entity);
-        String filledTemplate = MultipartFileRepositoryStringUtils.formatWithNamedParams(pathTemplate, templateFillerMap);
+        String filledTemplate = FileSystemRepositoryStringUtils.formatWithNamedParams(pathTemplate, templateFillerMap);
         return Paths.get(filledTemplate);
     }
 
@@ -98,7 +104,7 @@ class MultipartFileRepositoryBase<T> {
                 templateFillerMap.put(fieldName, fieldValue);
             } catch (IllegalAccessException ignored) {
             } catch (Exception e) {
-                throw new MultipartFileRepositoryException(e);
+                throw new FileSystemRepositoryException(e);
             }
         }
         return templateFillerMap;
@@ -109,9 +115,9 @@ class MultipartFileRepositoryBase<T> {
      * @return fields name or if 'SavePathVariable' annotation is used on the variable returns value passed to it.
      */
     protected String getPathVariableName(Field field) {
-        SavePathVariable savePathVariableAnnotation = field.getAnnotation(SavePathVariable.class);
-        if (Objects.nonNull(savePathVariableAnnotation) && !savePathVariableAnnotation.value().isBlank()) {
-            return savePathVariableAnnotation.value();
+        FileSystemSavePathVariable fileSystemSavePathVariableAnnotation = field.getAnnotation(FileSystemSavePathVariable.class);
+        if (Objects.nonNull(fileSystemSavePathVariableAnnotation) && !fileSystemSavePathVariableAnnotation.value().isBlank()) {
+            return fileSystemSavePathVariableAnnotation.value();
         }
         return field.getName();
     }

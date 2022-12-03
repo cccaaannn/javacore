@@ -1,12 +1,14 @@
-package com.kurtcan.javacore.repository.multipartfile.aspect.annotations;
+package com.kurtcan.javacore.repository.filesystem.aspect.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(ElementType.FIELD)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SavePathVariable {
-    String value() default "";
+public @interface FileSystemEntity {
+    String value();
+    boolean overrideExisting() default true;
+
 }

@@ -1,27 +1,26 @@
-package com.kurtcan.javacore.repository.multipartfile.concretes;
+package com.kurtcan.javacore.repository.filesystem.concretes;
 
-import com.kurtcan.javacore.repository.multipartfile.abstracts.IMultipartFileRepository;
+import com.kurtcan.javacore.repository.filesystem.abstracts.IFileSystemRepository;
+import com.kurtcan.javacore.repository.filesystem.exceptions.FileSystemRepositoryIOException;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 
 /**
- * <h2>MultipartFileRepository implementation.</h2>
+ * <h2>FileSystemRepository implementation.</h2>
  * <hr/>
  *
  * @param <T> entity type
- *
  * @author Can Kurt
- * @version 1.0
+ * @version 2.0
  * @since 2022-11-26
  */
 @Component
-public class MultipartFileRepository<T> extends MultipartFileRepositoryBase<T> implements IMultipartFileRepository<T> {
+public class FileSystemRepositoryImpl<T> extends FileSystemRepositoryBase<T> implements IFileSystemRepository<T> {
 
     @Override
-    public Path save(T entity) throws IOException {
+    public Path save(T entity) throws FileSystemRepositoryIOException {
         Path absSavePath = this.buildSavePathFromEntityFields(entity);
         this.saveFileFromEntityField(entity, absSavePath);
         return absSavePath;
