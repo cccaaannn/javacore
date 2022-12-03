@@ -14,4 +14,16 @@ public class Message {
 
     private List<String> to;
 
+    public static class MessageBuilder {
+        public MessageBuilder to(String to) {
+            this.to = List.of(to);
+            return this;
+        }
+
+        public MessageBuilder to(List<String> to) {
+            this.to = to;
+            return this;
+        }
+    }
+
 }
